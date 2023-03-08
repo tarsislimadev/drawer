@@ -1,5 +1,4 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.132.2/build/three.module.js'
-// import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js'
 import ThreeMeshUI from 'https://cdn.skypack.dev/three-mesh-ui'
 
 const fontFamily = 'https://unpkg.com/three-mesh-ui/examples/assets/Roboto-msdf.json'
@@ -31,12 +30,7 @@ function makeTextPanel(content = '', fontSize = 0.1) {
 	const backgroundColor = new THREE.Color('black')
 	const fontColor = new THREE.Color('blue')
 
-	console.log({ content, fontSize, backgroundColor, fontColor })
-
 	const container = new ThreeMeshUI.Block({
-		// justifyContent: 'center',
-		// flexDirection: 'column',
-		// alignContent: 'center',
 		height: fontSize,
 		width: fontSize,
 		backgroundColor,
@@ -52,20 +46,16 @@ function makeTextPanel(content = '', fontSize = 0.1) {
 	)
 	scene.add(container)
 
-	
 	container.add(new ThreeMeshUI.Text({ content, fontSize, fontColor }))
 
 	return container
 }
 
-const animate = function () {
+function render() {
 	meshes.forEach((mesh) => mesh.position.y -= 0.1)
-
-	// 
 	ThreeMeshUI.update()
 	renderer.render(scene, camera)
-	requestAnimationFrame(animate)
+	requestAnimationFrame(render)
 }
 
-window.addEventListener('load', () => animate())
-
+requestAnimationFrame(render)
