@@ -1,9 +1,5 @@
-# env
-
-To set up environments.
+# bita
 
 ## License
 
 [MIT](./LICENSE)
-# bita
-# bita
