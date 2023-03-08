@@ -1,31 +1,71 @@
-import * as THREE from './node_modules/three/build/three.module.js'
+import * as THREE from 'https://cdn.skypack.dev/three@0.132.2/build/three.module.js'
+// import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js'
+import ThreeMeshUI from 'https://cdn.skypack.dev/three-mesh-ui'
 
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10)
-camera.position.z = 1
+const fontFamily = 'https://unpkg.com/three-mesh-ui/examples/assets/Roboto-msdf.json'
+const fontTexture = 'https://unpkg.com/three-mesh-ui/examples/assets/Roboto-msdf.png'
+
+const WIDTH = window.innerWidth
+const HEIGHT = window.innerHeight
 
 const scene = new THREE.Scene()
 
-const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2)
-const material = new THREE.MeshNormalMaterial()
+const camera = new THREE.PerspectiveCamera(75, WIDTH / HEIGHT, 0.1, 1000)
+camera.position.z = 100
 
-const mesh = new THREE.Mesh(geometry, material)
-scene.add(mesh)
-
-const renderer = new THREE.WebGLRenderer({ antialias: true })
+const renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
-renderer.setAnimationLoop(animation)
 document.body.appendChild(renderer.domElement)
 
-// animation
+const meshes = []
+const listString = (() => Array.from(Array(10))
+	.map((_, n) => String.fromCodePoint(n + 97)))()
 
-function animation(time) {
-  mesh.rotation.x = time / 2000
-  mesh.rotation.y = time / 1000
+const randomFloor = (n) => Math.floor(Math.random() * n)
 
-  renderer.render(scene, camera)
+const randomString = () => listString[randomFloor(listString.length)]
+
+setInterval(() => meshes.push(makeTextPanel(randomString(), randomFloor(10))), 1000)
+
+function makeTextPanel(content = '', fontSize = 0.1) {
+	const backgroundColor = new THREE.Color('black')
+	const fontColor = new THREE.Color('blue')
+
+	console.log({ content, fontSize, backgroundColor, fontColor })
+
+	const container = new ThreeMeshUI.Block({
+		// justifyContent: 'center',
+		// flexDirection: 'column',
+		// alignContent: 'center',
+		height: fontSize,
+		width: fontSize,
+		backgroundColor,
+		fontTexture,
+		fontFamily,
+		fontColor,
+	})
+
+	container.position.set(
+		randomFloor(200) - (200 / 2),
+		100,
+		0
+	)
+	scene.add(container)
+
+	
+	container.add(new ThreeMeshUI.Text({ content, fontSize, fontColor }))
+
+	return container
 }
 
-window.onresize = function () {
-  renderer.setSize(window.innerWidth, window.innerHeight)
-  // camera.aspect = (window.innerWidth / window.innerHeight)
+const animate = function () {
+	meshes.forEach((mesh) => mesh.position.y -= 0.1)
+
+	// 
+	ThreeMeshUI.update()
+	renderer.render(scene, camera)
+	requestAnimationFrame(animate)
 }
+
+window.addEventListener('load', () => animate())
+
