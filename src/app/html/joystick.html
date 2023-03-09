@@ -49,8 +49,6 @@
       socket.on('message', (message) => console.log('message', message))
 
       input.addEventListener('keypress', (ev) => {
-        console.log({ ev })
-
         const letter = String.fromCharCode(ev.keyCode)
         socket.emit('joystick', [
           socket.id,
