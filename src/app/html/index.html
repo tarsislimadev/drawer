@@ -40,6 +40,9 @@
     const WIDTH = window.innerWidth
     const HEIGHT = window.innerHeight
 
+    const gamerLetters = []
+    const meshes = []
+
     const scene = new THREE.Scene()
 
     const camera = new THREE.PerspectiveCamera(75, WIDTH / HEIGHT, 0.1, 1000)
@@ -49,19 +52,22 @@
     renderer.setSize(window.innerWidth, window.innerHeight)
     document.body.appendChild(renderer.domElement)
 
-    const meshes = []
-    const listString = (() => Array.from(Array(10))
-      .map((_, n) => String.fromCodePoint(n + 97)))()
+    const listString = Array.from(Array(10)).map((_, n) => String.fromCodePoint(n + 97))
 
-    const randomFloor = (n) => Math.floor(Math.random() * n)
+    const randomFloor = (n, m = 0) => Math.floor(Math.random() * n) + m
 
     const randomString = () => listString[randomFloor(listString.length)]
 
-    setInterval(() => meshes.push(makeTextPanel(randomString(), randomFloor(10))), 1000)
+    setInterval(() => {
+      const color = gamerLetters.length ? 'yellow' : 'blue'
+      const letter = gamerLetters.length ? gamerLetters.pop() : randomString()
 
-    function makeTextPanel(content = '', fontSize = 0.1) {
+      meshes.push(makeTextPanel(letter, randomFloor(10, 2), color))
+    }, 1000)
+
+    function makeTextPanel(content = '', fontSize = 0.1, color = 'blue') {
       const backgroundColor = new THREE.Color('black')
-      const fontColor = new THREE.Color('blue')
+      const fontColor = new THREE.Color(color)
 
       const container = new ThreeMeshUI.Block({
         height: fontSize,
@@ -98,15 +104,14 @@
     const socket = socketIO.io('0.0.0.0:8080')
 
     socket.on("connect", () => {
-      console.log('connect', socket)
-
       socket.emit('message', Date.now().toString())
       socket.on('message', (message) => console.log('message', message))
-      socket.on('joystick', (joystick) => console.log('joystick', joystick))
-    })
+      socket.on('joystick', (joystick) => {
+        const [, letter] = joystick.split(';')
+        const [, realLetter] = letter.split(':')
 
-    socket.on("disconnect", () => {
-      console.log('disconnect', socket.id)
+        gamerLetters.push(realLetter)
+      })
     })
 
   </script>
