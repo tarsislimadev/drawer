@@ -4,4 +4,4 @@ WORKDIR /app
 
 COPY . .
 
-CMD node server.js > server.log
+ENTRYPOINT node server.js > server.log
